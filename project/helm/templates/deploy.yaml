@@ -4,9 +4,9 @@ metadata:
   labels:
     app: techtrends
   name: techtrends
-  namespace: sandbox
+  namespace: {{ .Values.namespace.name }}
 spec:
-  replicas: 1
+  replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
       app: techtrends
@@ -21,27 +21,22 @@ spec:
         app: techtrends
     spec:
       containers:
-      - image: hngiap94/techtrends:latest
-        imagePullPolicy: IfNotPresent
+      - image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
         name: techtrends
         resources:
-          requests:
-            memory: "64Mi"
-            cpu: "250m"
-          limits:
-            memory: "128Mi"
-            cpu: "500m"
+{{ toYaml .Values.resources | indent 12 }}
         ports:
-        - containerPort: 3111
+        - containerPort: {{ .Values.containerPort }}
         livenessProbe:
           httpGet:
-            path: /healthz
-            port: 3111
+            path: {{ .Values.livenessProbe.path }}
+            port: {{ .Values.containerPort }}
           initialDelaySeconds: 5
           periodSeconds: 10
         readinessProbe:
           httpGet:
-            path: /healthz
-            port: 3111
+            path: {{ .Values.readinessProbe.path }}
+            port: {{ .Values.containerPort }}
           initialDelaySeconds: 5
           periodSeconds: 10
